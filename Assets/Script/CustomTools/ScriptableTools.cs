@@ -9,28 +9,46 @@ public class ScriptableTools : Overlay
 {
     public override VisualElement CreatePanelContent()
     {
-        var root = new VisualElement();
-        Button btnBowser = new Button(SpawnBowser);
-        root.Add(btnBowser);
-        Button btnChamp = new Button(SpawnChamp);
-        root.Add(btnChamp);
-        return root;
+        VisualElement panel = new VisualElement();
+        Button btnCoin = new Button(SpawnCoin) { text = "Spawn Coin" };
+        btnCoin.style.height = 48;
+        panel.Add(btnCoin);
+
+        Button btnEnemy = new Button(SpawnEnemy) { text = "Spawn Enemy" };
+        btnEnemy.style.height = 48;
+        panel.Add(btnEnemy);
+
+        Button btnPistol = new Button(SpawnPistol) { text = "Spawn Pistol" };
+        btnPistol.style.height = 48;
+        panel.Add(btnPistol);
+
+        return panel;
     }
-    private void SpawnBowser()
+    private void Spawn(string prefabName)
     {
-        Scene scene = SceneManager.GetActiveScene();
-        GameManager gameManager = null;
-        foreach (GameObject obj in scene.GetRootGameObjects())
-        {
-            if (obj.CompareTag("GameManager"))
-            {
-                gameManager = obj.GetComponent<GameManager>();
-                break;
-            }
-        }
+        GameObject prefab = Resources.Load<GameObject>(prefabName);
+
+        GameObject obj = (GameObject)PrefabUtility.InstantiatePrefab(
+            prefab, SceneManager.GetActiveScene());
+
+        obj.transform.position = SceneView.lastActiveSceneView.pivot;
+
+        Undo.RegisterCreatedObjectUndo(obj, "Spawn " + prefabName);
     }
-    void SpawnChamp()
+       private void SpawnCoin()
     {
-        
+        Spawn("Coin");
     }
+
+    private void SpawnEnemy()
+    {
+        Spawn("Enemy");
+    }
+
+    private void SpawnPistol()
+    {
+        Spawn("PickUpPistol Variant");
+    }
+
+
 }

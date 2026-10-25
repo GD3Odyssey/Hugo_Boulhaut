@@ -6,8 +6,13 @@ public class Coin : MonoBehaviour
 {
     [SerializeField] private float hauteur = 2f;
     [SerializeField] private float animation = 1f;
+    
+    public float rotationSpeed = 90f;
     private bool collected = false;
-    // Start is called before the first frame update
+    void Update()
+    {
+        transform.Rotate(Vector3.up * rotationSpeed * Time.deltaTime);
+    }
     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("Player") && !collected)

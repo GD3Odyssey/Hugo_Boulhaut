@@ -2,34 +2,99 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     [SerializeField] private Text scoreText;
     public int score = 0;
-    // Start is called before the first frame update
+    public Text healthText;
+    public Text ammoText;
+    public Text enemyText;
+    public Text messageText;
+    public int enemiesRemaining = 0;
+    private bool gameEnded = false;
+    public bool GameEnded => gameEnded;
+
     private void Awake()
     {
-        if(Instance != null && Instance != this)
+        if (Instance != null && Instance != this)
         {
-            Destroy(this);
+            Destroy(gameObject);
+            return;
         }
-        else
+        Instance = this;
+    }
+    void Start()
+    {
+        UpdateScore();
+        UpdateHealth(100);
+
+        enemiesRemaining = FindObjectsByType<Enemy>(FindObjectsSortMode.None).Length;
+        UpdateEnemies();
+
+        messageText.text = "";
+    }
+    
+    void Update()
+    {
+        if (gameEnded && Input.GetKeyDown(KeyCode.R))
         {
-            Instance = this;
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 
-    // Update is called once per frame
     public void AddScore(int points)
     {
         score += points;
         scoreText.text = "Score: " + score.ToString();
 
     }
-      public void Spawn(string enemyName)
+
+    void UpdateScore()
     {
-       
+        scoreText.text = "Score : " + score;
+    }
+    public void UpdateHealth(int health)
+    {
+        healthText.text = "PV : " + health;
+    }
+    public void UpdateAmmo(int ammo)
+    {
+        ammoText.text = "Munitions : " + ammo;
+    }
+    
+    public void EnemyKilled()
+    {
+        enemiesRemaining = Mathf.Max(0, enemiesRemaining - 1);
+        UpdateEnemies();
+
+        if (enemiesRemaining == 0)
+        {
+            Win();
+        }
+    }
+
+    void UpdateEnemies()
+    {
+        enemyText.text = "Ennemis : " + enemiesRemaining;
+    }
+    public void Win()
+    {
+        if (gameEnded) return;
+
+        gameEnded = true;
+        messageText.text = "VICTOIRE !\nAppuie sur R pour recommencer";
+        Time.timeScale = 0f;
+    }
+    public void GameOver()
+    {
+        if (gameEnded) return;
+
+        gameEnded = true;
+        messageText.text = "GAME OVER\nR pour recommencer";
+        Time.timeScale = 0f;
     }
 }
